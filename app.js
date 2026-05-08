@@ -129,10 +129,12 @@ function buildEditor(c) {
   const editor = document.createElement('div');
   editor.className = 'contact-edit';
 
+  const nameLabel = makeField('Name', 'input', c.name);
   const teamLabel = makeField('Team / Org', 'input', c.team);
   const titleLabel = makeField('Role', 'input', c.title);
   const notesLabel = makeField('Notes', 'textarea', c.notes);
 
+  editor.appendChild(nameLabel);
   editor.appendChild(teamLabel);
   editor.appendChild(titleLabel);
   editor.appendChild(notesLabel);
@@ -145,7 +147,14 @@ function buildEditor(c) {
   updateBtn.className = 'btn-update';
   updateBtn.textContent = 'Update';
   updateBtn.addEventListener('click', function () {
+    const nameInput = nameLabel.querySelector('input');
+    const newName = nameInput.value.trim();
+    if (!newName) {
+      nameInput.focus();
+      return;
+    }
     updateContact(c.id, {
+      name: newName,
       team: teamLabel.querySelector('input').value.trim(),
       title: titleLabel.querySelector('input').value.trim(),
       notes: notesLabel.querySelector('textarea').value.trim(),
