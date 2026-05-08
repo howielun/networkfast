@@ -20,6 +20,19 @@ tabAdd.addEventListener('click', () => switchTab('add'));
 tabSaved.addEventListener('click', () => switchTab('saved'));
 searchInput.addEventListener('input', renderContacts);
 
+let eggTaps = 0;
+let eggTimer;
+document.getElementById('disclaimer').addEventListener('click', function () {
+  eggTaps++;
+  clearTimeout(eggTimer);
+  if (eggTaps >= 5) {
+    eggTaps = 0;
+    showToast('Designed by Howie 🙂');
+  } else {
+    eggTimer = setTimeout(function () { eggTaps = 0; }, 2000);
+  }
+});
+
 form.addEventListener('submit', function (e) {
   e.preventDefault();
 
@@ -84,7 +97,7 @@ function renderContacts() {
     ? all.filter(c => [c.name, c.team, c.title, c.notes].some(f => f && f.toLowerCase().includes(query)))
     : all;
 
-  milestoneCount.textContent = 'Tech X 2026 — ' + all.length + ' people met so far';
+  milestoneCount.textContent = 'Tech X 2026 — ' + all.length + (all.length === 1 ? ' connection' : ' connections');
   milestoneMsg.textContent = milestoneMessage(all.length);
   contactUl.innerHTML = '';
 
