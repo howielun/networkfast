@@ -150,6 +150,9 @@
       border: 1.5px solid #ddd;
       border-radius: 8px;
       padding: 12px 14px;
+    }
+
+    .contact-header {
       cursor: pointer;
     }
 
@@ -162,6 +165,68 @@
       font-size: 0.85rem;
       color: #666;
       margin-top: 2px;
+    }
+
+    .contact-edit {
+      margin-top: 12px;
+      padding-top: 12px;
+      border-top: 1px solid #eee;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+
+    .contact-edit label {
+      font-size: 0.7rem;
+    }
+
+    .contact-edit input,
+    .contact-edit textarea {
+      font-size: 0.95rem;
+      padding: 10px 12px;
+    }
+
+    .contact-edit textarea {
+      min-height: 70px;
+    }
+
+    .contact-actions {
+      display: flex;
+      gap: 8px;
+      margin-top: 2px;
+    }
+
+    .btn-update {
+      flex: 1;
+      padding: 12px;
+      font-family: inherit;
+      font-size: 0.95rem;
+      font-weight: 600;
+      background: #2563eb;
+      color: #fff;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+    }
+
+    .btn-update:active {
+      background: #1d4ed8;
+    }
+
+    .btn-delete {
+      padding: 10px 14px;
+      font-family: inherit;
+      font-size: 0.85rem;
+      font-weight: 600;
+      background: #fff;
+      color: #dc2626;
+      border: 1.5px solid #fecaca;
+      border-radius: 8px;
+      cursor: pointer;
+    }
+
+    .btn-delete:active {
+      background: #fef2f2;
     }
 
     #milestone {
@@ -179,6 +244,7 @@
       font-size: 0.85rem;
       color: #777;
       margin-top: 3px;
+      white-space: pre-line;
     }
 
     #toast {

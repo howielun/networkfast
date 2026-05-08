@@ -1,5 +1,4 @@
 const form = document.getElementById('contact-form');
-const saveBtn = document.getElementById('save-btn');
 const toast = document.getElementById('toast');
 const contactUl = document.getElementById('contact-ul');
 const milestoneCount = document.getElementById('milestone-count');
@@ -42,41 +41,20 @@ form.addEventListener('submit', function (e) {
     return;
   }
 
-  const contacts = JSON.parse(localStorage.getItem('contacts') || '[]');
-
-  if (editingId) {
-    const idx = contacts.findIndex(c => c.id === editingId);
-    if (idx !== -1) {
-      contacts[idx] = {
-        ...contacts[idx],
-        name,
-        team: document.getElementById('team').value.trim(),
-        title: document.getElementById('title').value.trim(),
-        notes: document.getElementById('notes').value.trim(),
-      };
-    }
-    localStorage.setItem('contacts', JSON.stringify(contacts));
-    editingId = null;
-    saveBtn.textContent = 'Save';
-    form.reset();
-    renderContacts();
-    showToast('Updated!');
-    switchTab('saved');
-  } else {
-    contacts.push({
-      id: crypto.randomUUID(),
-      name,
-      team: document.getElementById('team').value.trim(),
-      title: document.getElementById('title').value.trim(),
-      notes: document.getElementById('notes').value.trim(),
-      createdAt: new Date().toISOString(),
-    });
-    localStorage.setItem('contacts', JSON.stringify(contacts));
-    form.reset();
-    document.getElementById('name').focus();
-    renderContacts();
-    showToast('Saved!');
-  }
+  const contacts = readContacts();
+  contacts.push({
+    id: crypto.randomUUID(),
+    name,
+    team: document.getElementById('team').value.trim(),
+    title: document.getElementById('title').value.trim(),
+    notes: document.getElementById('notes').value.trim(),
+    createdAt: new Date().toISOString(),
+  });
+  writeContacts(contacts);
+  form.reset();
+  document.getElementById('name').focus();
+  renderContacts();
+  showToast('Saved!');
 });
 
 function switchTab(tab) {
@@ -88,9 +66,17 @@ function switchTab(tab) {
   if (isAdd) document.getElementById('name').focus();
 }
 
+function readContacts() {
+  return JSON.parse(localStorage.getItem('contacts') || '[]');
+}
+
+function writeContacts(contacts) {
+  localStorage.setItem('contacts', JSON.stringify(contacts));
+}
+
 function renderContacts() {
   const query = searchInput.value.trim().toLowerCase();
-  const all = JSON.parse(localStorage.getItem('contacts') || '[]');
+  const all = readContacts();
   all.sort((a, b) => (a.createdAt < b.createdAt ? 1 : -1));
 
   const contacts = query
@@ -102,37 +88,134 @@ function renderContacts() {
   contactUl.innerHTML = '';
 
   contacts.forEach(function (c) {
-    const meta = [c.title, c.team].filter(Boolean).join(' · ');
-    const li = document.createElement('li');
-    li.innerHTML =
-      '<div class="contact-name">' + escapeHtml(c.name) + '</div>' +
-      (meta ? '<div class="contact-meta">' + escapeHtml(meta) + '</div>' : '');
-    li.addEventListener('click', function () {
-      document.getElementById('name').value = c.name;
-      document.getElementById('team').value = c.team;
-      document.getElementById('title').value = c.title;
-      document.getElementById('notes').value = c.notes;
-      editingId = c.id;
-      saveBtn.textContent = 'Update';
-      switchTab('add');
-    });
-    contactUl.appendChild(li);
+    contactUl.appendChild(buildContactItem(c));
   });
 }
 
-function milestoneMessage(n) {
-  if (n === 0)  return 'No people yet. Go talk to someone 🙂';
-  if (n >= 50)  return "That's a lot of conversations. Your social battery deserves a break.";
-  if (n >= 40)  return 'This is a good day for hallway conversations.';
-  if (n >= 30)  return "You're in the flow now. Conversations everywhere.";
-  if (n >= 20)  return 'Solid momentum. Definitely worth coming here.';
-  if (n >= 10)  return "You're warming up. This conference is starting to work.";
-  if (n >= 5)   return "Nice start. You've officially broken the ice.";
-  return '';
+function buildContactItem(c) {
+  const li = document.createElement('li');
+
+  const header = document.createElement('div');
+  header.className = 'contact-header';
+
+  const nameDiv = document.createElement('div');
+  nameDiv.className = 'contact-name';
+  nameDiv.textContent = c.name;
+  header.appendChild(nameDiv);
+
+  const meta = [c.title, c.team].filter(Boolean).join(' · ');
+  if (meta) {
+    const metaDiv = document.createElement('div');
+    metaDiv.className = 'contact-meta';
+    metaDiv.textContent = meta;
+    header.appendChild(metaDiv);
+  }
+
+  header.addEventListener('click', function () {
+    editingId = (editingId === c.id) ? null : c.id;
+    renderContacts();
+  });
+
+  li.appendChild(header);
+
+  if (editingId === c.id) {
+    li.appendChild(buildEditor(c));
+  }
+
+  return li;
 }
 
-function escapeHtml(str) {
-  return str.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+function buildEditor(c) {
+  const editor = document.createElement('div');
+  editor.className = 'contact-edit';
+
+  const teamLabel = makeField('Team / Org', 'input', c.team);
+  const titleLabel = makeField('Role', 'input', c.title);
+  const notesLabel = makeField('Notes', 'textarea', c.notes);
+
+  editor.appendChild(teamLabel);
+  editor.appendChild(titleLabel);
+  editor.appendChild(notesLabel);
+
+  const actions = document.createElement('div');
+  actions.className = 'contact-actions';
+
+  const updateBtn = document.createElement('button');
+  updateBtn.type = 'button';
+  updateBtn.className = 'btn-update';
+  updateBtn.textContent = 'Update';
+  updateBtn.addEventListener('click', function () {
+    updateContact(c.id, {
+      team: teamLabel.querySelector('input').value.trim(),
+      title: titleLabel.querySelector('input').value.trim(),
+      notes: notesLabel.querySelector('textarea').value.trim(),
+    });
+  });
+
+  const deleteBtn = document.createElement('button');
+  deleteBtn.type = 'button';
+  deleteBtn.className = 'btn-delete';
+  deleteBtn.textContent = 'Delete';
+  deleteBtn.addEventListener('click', function () {
+    if (confirm('Delete ' + c.name + '? This cannot be undone.')) {
+      deleteContact(c.id);
+    }
+  });
+
+  actions.appendChild(updateBtn);
+  actions.appendChild(deleteBtn);
+  editor.appendChild(actions);
+
+  return editor;
+}
+
+function makeField(text, type, value) {
+  const label = document.createElement('label');
+  label.appendChild(document.createTextNode(text));
+  const input = type === 'textarea'
+    ? document.createElement('textarea')
+    : Object.assign(document.createElement('input'), { type: 'text' });
+  input.value = value || '';
+  label.appendChild(input);
+  return label;
+}
+
+function updateContact(id, fields) {
+  const contacts = readContacts();
+  const idx = contacts.findIndex(c => c.id === id);
+  if (idx !== -1) {
+    contacts[idx] = { ...contacts[idx], ...fields };
+    writeContacts(contacts);
+  }
+  editingId = null;
+  renderContacts();
+  showToast('Updated!');
+}
+
+function deleteContact(id) {
+  const contacts = readContacts().filter(c => c.id !== id);
+  writeContacts(contacts);
+  editingId = null;
+  renderContacts();
+  showToast('Deleted');
+}
+
+function milestoneMessage(n) {
+  if (n >= 50) return "That’s a lot of conversations.\nYour social battery deserves a break 😌";
+  const milestone = Math.floor(n / 5) * 5;
+  switch (milestone) {
+    case 0:  return 'No people yet. Go talk to someone 🙂';
+    case 5:  return 'Nice start. The first few conversations are always the hardest.';
+    case 10: return 'You’re warming up. Names are starting to stick.';
+    case 15: return 'Momentum found. This already feels worthwhile.';
+    case 20: return 'Good pace. You’re getting real signal now.';
+    case 25: return 'Halfway through the day, probably. Still curious.';
+    case 30: return 'You’re in the flow now. Conversations come naturally.';
+    case 35: return 'Solid stretch. Take a moment to breathe.';
+    case 40: return 'A lot of context gathered. Patterns emerging.';
+    case 45: return 'That’s a full day of conversations. Nicely done.';
+  }
+  return '';
 }
 
 function showToast(msg) {
