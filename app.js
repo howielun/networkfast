@@ -210,21 +210,18 @@ function deleteContact(id) {
 }
 
 function milestoneMessage(n) {
-  if (n >= 50) return "That’s a lot of conversations.\nYour social battery deserves a break 😌";
-  const milestone = Math.floor(n / 5) * 5;
-  switch (milestone) {
-    case 0:  return 'No people yet. Go talk to someone 🙂';
-    case 5:  return 'Nice start. The first few conversations are always the hardest.';
-    case 10: return 'You’re warming up. Names are starting to stick.';
-    case 15: return 'Momentum found. This already feels worthwhile.';
-    case 20: return 'Good pace. You’re getting real signal now.';
-    case 25: return 'Halfway through the day, probably. Still curious.';
-    case 30: return 'You’re in the flow now. Conversations come naturally.';
-    case 35: return 'Solid stretch. Take a moment to breathe.';
-    case 40: return 'A lot of context gathered. Patterns emerging.';
-    case 45: return 'That’s a full day of conversations. Nicely done.';
-  }
-  return '';
+  if (n === 0)             return 'No people yet. Go talk to someone 🙂';
+  if (n >= 1  && n < 5)    return 'No people yet. Go talk to someone 🙂';
+  if (n >= 5  && n < 10)   return 'Nice start. The first few conversations are always the hardest.';
+  if (n >= 10 && n < 15)   return 'You’re warming up. Names are starting to stick.';
+  if (n >= 15 && n < 20)   return 'Momentum found. This already feels worthwhile.';
+  if (n >= 20 && n < 25)   return 'Good pace. You’re getting real signal now.';
+  if (n >= 25 && n < 30)   return 'Halfway through the day, probably. Still curious.';
+  if (n >= 30 && n < 35)   return 'You’re in the flow now. Conversations come naturally.';
+  if (n >= 35 && n < 40)   return 'Solid stretch. Take a moment to breathe.';
+  if (n >= 40 && n < 45)   return 'A lot of context gathered. Patterns emerging.';
+  if (n >= 45 && n < 50)   return 'That’s a full day of conversations. Nicely done.';
+  return "That’s a lot of conversations.\nYour social battery deserves a break 😌";
 }
 
 function showToast(msg) {
