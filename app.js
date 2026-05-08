@@ -211,7 +211,7 @@ function deleteContact(id) {
 
 function milestoneMessage(n) {
   if (n === 0)             return 'No people yet. Go talk to someone 🙂';
-  if (n >= 1  && n < 5)    return 'No people yet. Go talk to someone 🙂';
+  if (n >= 1  && n < 5)    return 'Nice start. The first conversations always matter.';
   if (n >= 5  && n < 10)   return 'Nice start. The first few conversations are always the hardest.';
   if (n >= 10 && n < 15)   return 'You’re warming up. Names are starting to stick.';
   if (n >= 15 && n < 20)   return 'Momentum found. This already feels worthwhile.';
