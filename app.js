@@ -8,6 +8,7 @@ const tabAdd = document.getElementById('tab-add');
 const tabSaved = document.getElementById('tab-saved');
 const panelAdd = document.getElementById('panel-add');
 const panelSaved = document.getElementById('panel-saved');
+const exportBtn = document.getElementById('export-btn');
 
 let editingId = null;
 let toastTimer;
@@ -18,6 +19,7 @@ renderContacts();
 tabAdd.addEventListener('click', () => switchTab('add'));
 tabSaved.addEventListener('click', () => switchTab('saved'));
 searchInput.addEventListener('input', renderContacts);
+exportBtn.addEventListener('click', exportContacts);
 
 let eggTaps = 0;
 let eggTimer;
@@ -222,6 +224,52 @@ function milestoneMessage(n) {
   if (n >= 40 && n < 45)   return 'A lot of context gathered. Patterns emerging.';
   if (n >= 45 && n < 50)   return 'That’s a full day of conversations. Nicely done.';
   return "That’s a lot of conversations.\nYour social battery deserves a break 😌";
+}
+
+async function exportContacts() {
+  const contacts = readContacts();
+  const csv = buildCsv(contacts);
+  const filename = 'networkfast-tech-x-2026.csv';
+  const bom = String.fromCharCode(0xFEFF);
+  const blob = new Blob([bom + csv], { type: 'text/csv;charset=utf-8' });
+
+  if (navigator.canShare && navigator.share && typeof File === 'function') {
+    const file = new File([blob], filename, { type: 'text/csv' });
+    if (navigator.canShare({ files: [file] })) {
+      try {
+        await navigator.share({
+          files: [file],
+          title: 'NetworkFast contacts',
+          text: 'Tech X 2026 contacts',
+        });
+        return;
+      } catch (err) {
+        if (err && err.name === 'AbortError') return;
+      }
+    }
+  }
+
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = filename;
+  document.body.appendChild(a);
+  a.click();
+  document.body.removeChild(a);
+  setTimeout(() => URL.revokeObjectURL(url), 0);
+}
+
+function buildCsv(contacts) {
+  const header = ['Name', 'Team / Org', 'Role', 'Notes'].map(csvEscape).join(',');
+  const rows = contacts.map(c =>
+    [c.name, c.team, c.title, c.notes].map(csvEscape).join(',')
+  );
+  return [header, ...rows].join('\r\n');
+}
+
+function csvEscape(value) {
+  const s = value == null ? '' : String(value);
+  return /[",\r\n]/.test(s) ? '"' + s.replace(/"/g, '""') + '"' : s;
 }
 
 function showToast(msg) {

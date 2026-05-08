@@ -247,6 +247,26 @@
       white-space: pre-line;
     }
 
+    #export-btn {
+      display: block;
+      width: 100%;
+      max-width: 480px;
+      margin: 24px 0 0;
+      padding: 10px;
+      background: none;
+      border: none;
+      color: #888;
+      font-family: inherit;
+      font-size: 0.85rem;
+      font-weight: 500;
+      text-align: center;
+      cursor: pointer;
+    }
+
+    #export-btn:active {
+      color: #555;
+    }
+
     #toast {
       position: fixed;
       bottom: 24px;
@@ -310,6 +330,7 @@
       <input type="search" id="search" placeholder="Search…" autocomplete="off">
       <ul id="contact-ul"></ul>
     </section>
+    <button type="button" id="export-btn">Export &amp; share (.csv)</button>
   </div>
 
   <div id="toast"></div>
