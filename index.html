@@ -247,24 +247,44 @@
       white-space: pre-line;
     }
 
-    #export-btn {
-      display: block;
-      width: 100%;
+    #saved-header {
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      gap: 12px;
       max-width: 480px;
-      margin: 24px 0 0;
-      padding: 10px;
+      margin-bottom: 16px;
+    }
+
+    #saved-header #milestone {
+      flex: 1;
+      min-width: 0;
+      margin-bottom: 0;
+    }
+
+    #export-btn {
+      flex-shrink: 0;
+      width: 36px;
+      height: 36px;
+      padding: 0;
+      border-radius: 50%;
       background: none;
-      border: none;
+      border: 1.5px solid #ddd;
       color: #888;
-      font-family: inherit;
-      font-size: 0.85rem;
-      font-weight: 500;
-      text-align: center;
       cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
     }
 
     #export-btn:active {
+      background: #f0f0f0;
       color: #555;
+    }
+
+    #export-btn svg {
+      width: 18px;
+      height: 18px;
     }
 
     #toast {
@@ -323,14 +343,22 @@
 
   <div id="panel-saved" hidden>
     <section id="contact-list">
-      <div id="milestone">
-        <p id="milestone-count"></p>
-        <p id="milestone-msg"></p>
+      <div id="saved-header">
+        <div id="milestone">
+          <p id="milestone-count"></p>
+          <p id="milestone-msg"></p>
+        </div>
+        <button type="button" id="export-btn" aria-label="Export and share contacts">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+            <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
+            <path d="M16 6l-4-4-4 4"/>
+            <path d="M12 2v13"/>
+          </svg>
+        </button>
       </div>
       <input type="search" id="search" placeholder="Search…" autocomplete="off">
       <ul id="contact-ul"></ul>
     </section>
-    <button type="button" id="export-btn">Export &amp; share (.csv)</button>
   </div>
 
   <div id="toast"></div>
