@@ -28,7 +28,7 @@ document.getElementById('disclaimer').addEventListener('click', function () {
   clearTimeout(eggTimer);
   if (eggTaps >= 5) {
     eggTaps = 0;
-    showToast('Designed by Howie 🙂');
+    showToast('Designed by Howie 🙂', 'from AIP · PX');
   } else {
     eggTimer = setTimeout(function () { eggTaps = 0; }, 2000);
   }
@@ -272,9 +272,15 @@ function csvEscape(value) {
   return /[",\r\n]/.test(s) ? '"' + s.replace(/"/g, '""') + '"' : s;
 }
 
-function showToast(msg) {
+function showToast(msg, subText) {
   clearTimeout(toastTimer);
   toast.textContent = msg;
+  if (subText) {
+    const sub = document.createElement('span');
+    sub.className = 'sub';
+    sub.textContent = subText;
+    toast.appendChild(sub);
+  }
   toast.classList.add('show');
   toastTimer = setTimeout(() => toast.classList.remove('show'), 2000);
 }
